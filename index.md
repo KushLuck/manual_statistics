@@ -1,4 +1,4 @@
-# **Manual de manejo de bases de datos – R (Caso ficticio “AsegurAct”)**
+# **Manual de manejo de bases de datos – R**
 *Guía rápida para lectura, exploración, limpieza y manipulación de datos en R para entrevistas técnicas.*
 
 **Contexto del caso (ficticio, consistente en todo el manual):**
