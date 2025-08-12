@@ -1,19 +1,3 @@
-  ```yaml
-  ---
-  title: "Manual de manejo de bases de datos – R"
-  output:
-    html_document:
-      toc: true
-      toc_float: true
-  ---
-  ```
-
-  y knit a HTML.
-
-Aquí te dejo el **manual actualizado sin índice manual**, con la parte de Excel ampliada y con el bloque de lectura de hoja específica insertado:
-
----
-
 ````markdown
 # **Manual de manejo de bases de datos – R**
 *Guía rápida para lectura, exploración, limpieza y manipulación de datos en R para entrevistas técnicas.*
