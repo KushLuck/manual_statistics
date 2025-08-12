@@ -1,231 +1,201 @@
-# **Manual de manejo de bases de datos – Python & R**
+Perfecto ✅
+Vamos a rehacer tu **manual** desde cero, pero **solo en R**, con:
 
-*Guía rápida para lectura, exploración, limpieza y manipulación de datos.*
+* Índice inicial simple y clicable.
+* Comentarios claros línea por línea, pensados para entrevista.
+* Ejemplos reales y listos para copiar/pegar.
+* Sin enlaces de "volver al índice" para que sea limpio y directo.
+
+Aquí tienes el nuevo **`manual_estadistica.md`**:
+
+---
+
+````markdown
+# **Manual de manejo de bases de datos – R**
+*Guía rápida para lectura, exploración, limpieza y manipulación de datos en R.*
+
+---
+
+## 🧭 Índice
+
+1. [Lectura de archivos](#1-lectura-de-archivos)
+2. [Exploración de datos](#2-exploración-de-datos)
+3. [Selección y filtrado](#3-selección-y-filtrado)
+4. [Ordenamiento](#4-ordenamiento)
+5. [Agrupación y resumen](#5-agrupación-y-resumen)
+6. [Limpieza y transformación](#6-limpieza-y-transformación)
+7. [Joins](#7-joins)
+8. [Exportar datos](#8-exportar-datos)
 
 ---
 
 ## **1. Lectura de archivos**
 
-### **CSV**
-
-```python
-# Python (ruta directa más común)
-import pandas as pd
-df = pd.read_csv("archivo.csv")  # Ruta relativa o absoluta
-df.head()
+### CSV — ruta directa
+```r
+library(readr)                         # Librería para lectura rápida de texto (CSV, TSV)
+df <- read_csv("archivo.csv")          # Lee CSV con separador coma
+head(df)                               # Muestra primeras 6 filas para verificar
 ````
 
-```python
-# Python (seleccionando archivo con ventana emergente)
-import pandas as pd
-from tkinter import Tk
-from tkinter.filedialog import askopenfilename
-
-Tk().withdraw()
-archivo = askopenfilename(title="Seleccionar archivo CSV", filetypes=[("CSV files", "*.csv")])
-df = pd.read_csv(archivo)
-df.head()
-```
+### CSV — selección manual
 
 ```r
-# R (ruta directa)
 library(readr)
-df <- read_csv("archivo.csv")
+ruta <- file.choose()                  # Abre diálogo para seleccionar archivo
+df <- read_csv(ruta)                   # Lee CSV elegido
 head(df)
 ```
 
+> 💡 **Tip separador**: si el CSV usa `;`, cambia a `read_delim` con `delim=";"`
+
 ```r
-# R (seleccionando archivo manualmente)
-library(readr)
-ruta <- file.choose()
-df <- read_csv(ruta)
-head(df)
+df <- read_delim("archivo.csv", delim = ";")
 ```
 
 ---
 
-### **Excel**
-
-```python
-# Python
-df = pd.read_excel("archivo.xlsx")
-```
-
-```python
-# Python (con selección manual)
-from tkinter import Tk
-from tkinter.filedialog import askopenfilename
-import pandas as pd
-
-Tk().withdraw()
-archivo = askopenfilename(title="Seleccionar archivo Excel", filetypes=[("Excel files", "*.xlsx *.xls")])
-df = pd.read_excel(archivo)
-```
+### Excel — ruta directa
 
 ```r
-# R
-library(readxl)
-df <- read_excel("archivo.xlsx")
+library(readxl)                        # Librería para leer Excel
+df <- read_excel("archivo.xlsx")       # Lee primera hoja por defecto
+# df <- read_excel("archivo.xlsx", sheet = "Resumen")  # Hoja específica
+head(df)
 ```
 
+### Excel — selección manual
+
 ```r
-# R (seleccionando archivo)
 library(readxl)
-ruta <- file.choose()
+ruta <- file.choose()                  # Selección manual
 df <- read_excel(ruta)
+head(df)
 ```
 
 ---
 
-### **SQL**
-
-```python
-# Python
-import sqlite3
-import pandas as pd
-
-conn = sqlite3.connect("basedatos.db")
-df = pd.read_sql("SELECT * FROM tabla", conn)
-```
-
-```python
-# Python (con selección manual)
-from tkinter import Tk
-from tkinter.filedialog import askopenfilename
-import sqlite3
-import pandas as pd
-
-Tk().withdraw()
-archivo = askopenfilename(title="Seleccionar base de datos", filetypes=[("SQLite DB", "*.db *.sqlite")])
-conn = sqlite3.connect(archivo)
-df = pd.read_sql("SELECT * FROM tabla", conn)
-```
+### SQL (SQLite) — ruta directa
 
 ```r
-# R
-library(DBI)
-con <- dbConnect(RSQLite::SQLite(), "basedatos.db")
-df <- dbGetQuery(con, "SELECT * FROM tabla")
+library(DBI)                           # Conexión genérica a bases de datos
+library(RSQLite)                       # Driver para SQLite
+
+con <- dbConnect(SQLite(), "basedatos.db")  # Conecta/crea BD SQLite
+df <- dbGetQuery(con, "SELECT * FROM tabla") # Ejecuta SQL y devuelve data.frame
+# dbDisconnect(con)                    # Cierra conexión (buena práctica)
+head(df)
 ```
 
+### SQL — selección manual
+
 ```r
-# R (seleccionando archivo)
 library(DBI)
-ruta <- file.choose()
-con <- dbConnect(RSQLite::SQLite(), ruta)
+library(RSQLite)
+
+ruta <- file.choose()                  # Seleccionar archivo .db o .sqlite
+con <- dbConnect(SQLite(), ruta)
 df <- dbGetQuery(con, "SELECT * FROM tabla")
+head(df)
 ```
 
 ---
 
 ## **2. Exploración de datos**
 
-```python
-df.shape           # Dimensiones
-df.columns         # Nombres de columnas
-df.info()          # Tipos de datos
-df.describe()      # Resumen estadístico
-```
-
 ```r
-dim(df)            # Dimensiones
-colnames(df)       # Nombres de columnas
-str(df)            # Estructura y tipos
-summary(df)        # Resumen estadístico
+dim(df)                                # Número de filas y columnas
+colnames(df)                           # Nombres de columnas
+str(df)                                # Estructura: tipo de cada columna y muestra de datos
+summary(df)                            # Resumen estadístico
 ```
 
 ---
 
 ## **3. Selección y filtrado**
 
-```python
-df["columna"]
-df[["col1", "col2"]]
-df[df["columna"] > 100]
-df[(df["edad"] > 30) & (df["sexo"] == "M")]
-```
-
 ```r
-df$columna
-df[, c("col1", "col2")]
-df[df$columna > 100, ]
-subset(df, edad > 30 & sexo == "M")
+df$columna                             # Seleccionar una columna (vector)
+df[, c("col1", "col2")]                # Seleccionar varias columnas
+df[df$columna > 100, ]                 # Filtrar por condición simple
+subset(df, edad > 30 & ciudad == "Bogotá")  # Filtrar con múltiples condiciones
 ```
 
 ---
 
 ## **4. Ordenamiento**
 
-```python
-df.sort_values("columna")
-df.sort_values("columna", ascending=False)
-```
-
 ```r
-df[order(df$columna), ]
-df[order(-df$columna), ]
+df[order(df$columna), ]                # Orden ascendente por una columna
+df[order(-df$columna), ]               # Orden descendente
+# df[order(df$categoria, -df$valor), ]  # Ordenar por múltiples columnas
 ```
 
 ---
 
 ## **5. Agrupación y resumen**
 
-```python
-df.groupby("columna")["valor"].mean()
-df.groupby("columna").agg({"valor":"sum"})
-```
-
 ```r
 library(dplyr)
-df %>% group_by(columna) %>% summarise(prom = mean(valor))
-df %>% group_by(columna) %>% summarise(suma = sum(valor))
+
+df %>%
+  group_by(categoria) %>%
+  summarise(
+    total_venta = sum(venta, na.rm = TRUE),   # Suma con NA ignorados
+    prom_venta  = mean(venta, na.rm = TRUE)   # Promedio con NA ignorados
+  )
 ```
 
 ---
 
 ## **6. Limpieza y transformación**
 
-```python
-df.rename(columns={"old":"new"}, inplace=True)
-df["nueva"] = df["a"] + df["b"]
-df.dropna()
-df.fillna(0)
-```
-
 ```r
 library(dplyr)
-df <- rename(df, new = old)
-df <- mutate(df, nueva = a + b)
-df <- na.omit(df)
-df[is.na(df)] <- 0
+
+df <- df %>%
+  rename(new = old) %>%                # Renombra columna old → new
+  mutate(
+    nueva = a + b,                     # Crea columna derivada
+    # precio = if_else(is.na(precio), 0, precio),  # Relleno selectivo de NA
+    # precio_usd = precio / 4000                  # Conversión de moneda
+  )
+
+df <- na.omit(df)                      # Elimina filas con NA
+df[is.na(df)] <- 0                     # Rellena todos los NA con 0 (cuidado: todo el DF)
 ```
 
 ---
 
 ## **7. Joins**
 
-```python
-pd.merge(df1, df2, on="id", how="inner")  # inner, left, right, outer
-```
-
 ```r
-left_join(df1, df2, by="id")              # left, right, inner, full
+library(dplyr)
+
+# LEFT JOIN: mantiene todas las filas de df1
+df_join <- left_join(df1, df2, by = "id")
+
+# Ejemplo típico: mantener todos los clientes aunque no tengan ventas
+# df_join <- left_join(df_clientes, df_ventas, by = "id_cliente")
 ```
 
 ---
 
 ## **8. Exportar datos**
 
-```python
-df.to_csv("salida.csv", index=False)
-df.to_excel("salida.xlsx", index=False)
+```r
+library(readr)
+write_csv(df, "salida.csv")            # Exporta a CSV (UTF-8 por defecto)
+
+library(writexl)
+write_xlsx(df, "salida.xlsx")          # Exporta a Excel
 ```
 
-```r
-write_csv(df, "salida.csv")
-library(writexl)
-write_xlsx(df, "salida.xlsx")
 ```
 
 ---
 
+Si quieres, el siguiente paso podría ser **añadir al final una sección de funciones estadísticas rápidas** (media, mediana, correlación, máximo/mínimo, conteos) para que en la entrevista tengas también lo más usado en análisis exploratorio.  
+
+¿Quieres que te agregue esa sección de análisis estadístico rápido?
+```
